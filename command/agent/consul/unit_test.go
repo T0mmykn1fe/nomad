@@ -1771,7 +1771,7 @@ func TestConsul_ServiceDeregistration_OutProbation(t *testing.T) {
 	require.Len(ctx.ServiceClient.checks, 3)
 
 	delete(ctx.ServiceClient.services, outofbandTaskServiceID)
-	delete(ctx.ServiceClient.checks, makeCheckID(outofbandTaskServiceID, outofbandTask.Services[0].Checks[0]))
+	delete(ctx.ServiceClient.checks, MakeCheckID(outofbandTaskServiceID, outofbandTask.Services[0].Checks[0]))
 
 	require.Len(ctx.ServiceClient.services, 2)
 	require.Len(ctx.ServiceClient.checks, 2)
@@ -1788,9 +1788,9 @@ func TestConsul_ServiceDeregistration_OutProbation(t *testing.T) {
 	require.NotContains(ctx.FakeConsul.services, outofbandTaskServiceID)
 	require.NotContains(ctx.FakeConsul.services, explicitlyRemovedTaskServiceID)
 
-	require.Contains(ctx.FakeConsul.checks, makeCheckID(remainingTaskServiceID, remainingTask.Services[0].Checks[0]))
-	require.NotContains(ctx.FakeConsul.checks, makeCheckID(outofbandTaskServiceID, outofbandTask.Services[0].Checks[0]))
-	require.NotContains(ctx.FakeConsul.checks, makeCheckID(explicitlyRemovedTaskServiceID, explicitlyRemovedTask.Services[0].Checks[0]))
+	require.Contains(ctx.FakeConsul.checks, MakeCheckID(remainingTaskServiceID, remainingTask.Services[0].Checks[0]))
+	require.NotContains(ctx.FakeConsul.checks, MakeCheckID(outofbandTaskServiceID, outofbandTask.Services[0].Checks[0]))
+	require.NotContains(ctx.FakeConsul.checks, MakeCheckID(explicitlyRemovedTaskServiceID, explicitlyRemovedTask.Services[0].Checks[0]))
 }
 
 // TestConsul_ServiceDeregistration_InProbation asserts that during initialization
@@ -1880,7 +1880,7 @@ func TestConsul_ServiceDeregistration_InProbation(t *testing.T) {
 	require.Len(ctx.ServiceClient.checks, 3)
 
 	delete(ctx.ServiceClient.services, outofbandTaskServiceID)
-	delete(ctx.ServiceClient.checks, makeCheckID(outofbandTaskServiceID, outofbandTask.Services[0].Checks[0]))
+	delete(ctx.ServiceClient.checks, MakeCheckID(outofbandTaskServiceID, outofbandTask.Services[0].Checks[0]))
 
 	require.Len(ctx.ServiceClient.services, 2)
 	require.Len(ctx.ServiceClient.checks, 2)
@@ -1897,9 +1897,9 @@ func TestConsul_ServiceDeregistration_InProbation(t *testing.T) {
 	require.Contains(ctx.FakeConsul.services, outofbandTaskServiceID)
 	require.NotContains(ctx.FakeConsul.services, explicitlyRemovedTaskServiceID)
 
-	require.Contains(ctx.FakeConsul.checks, makeCheckID(remainingTaskServiceID, remainingTask.Services[0].Checks[0]))
-	require.Contains(ctx.FakeConsul.checks, makeCheckID(outofbandTaskServiceID, outofbandTask.Services[0].Checks[0]))
-	require.NotContains(ctx.FakeConsul.checks, makeCheckID(explicitlyRemovedTaskServiceID, explicitlyRemovedTask.Services[0].Checks[0]))
+	require.Contains(ctx.FakeConsul.checks, MakeCheckID(remainingTaskServiceID, remainingTask.Services[0].Checks[0]))
+	require.Contains(ctx.FakeConsul.checks, MakeCheckID(outofbandTaskServiceID, outofbandTask.Services[0].Checks[0]))
+	require.NotContains(ctx.FakeConsul.checks, MakeCheckID(explicitlyRemovedTaskServiceID, explicitlyRemovedTask.Services[0].Checks[0]))
 
 	// after probation, outofband services and checks are removed
 	ctx.ServiceClient.deregisterProbationExpiry = time.Now().Add(-1 * time.Hour)
@@ -1912,8 +1912,8 @@ func TestConsul_ServiceDeregistration_InProbation(t *testing.T) {
 	require.NotContains(ctx.FakeConsul.services, outofbandTaskServiceID)
 	require.NotContains(ctx.FakeConsul.services, explicitlyRemovedTaskServiceID)
 
-	require.Contains(ctx.FakeConsul.checks, makeCheckID(remainingTaskServiceID, remainingTask.Services[0].Checks[0]))
-	require.NotContains(ctx.FakeConsul.checks, makeCheckID(outofbandTaskServiceID, outofbandTask.Services[0].Checks[0]))
-	require.NotContains(ctx.FakeConsul.checks, makeCheckID(explicitlyRemovedTaskServiceID, explicitlyRemovedTask.Services[0].Checks[0]))
+	require.Contains(ctx.FakeConsul.checks, MakeCheckID(remainingTaskServiceID, remainingTask.Services[0].Checks[0]))
+	require.NotContains(ctx.FakeConsul.checks, MakeCheckID(outofbandTaskServiceID, outofbandTask.Services[0].Checks[0]))
+	require.NotContains(ctx.FakeConsul.checks, MakeCheckID(explicitlyRemovedTaskServiceID, explicitlyRemovedTask.Services[0].Checks[0]))
 
 }

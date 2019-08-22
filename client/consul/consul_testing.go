@@ -123,6 +123,17 @@ func (m *MockConsulServiceClient) AllocRegistrations(allocID string) (*consul.Al
 	return nil, nil
 }
 
+func (m *MockConsulServiceClient) UpdateTTL(id, output, status string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	// TODO(tgross): what should this all be?
+	// m.logger.Trace("UpdateTTL", "alloc_id", task.AllocID, "task", task.Name,
+	// 	"services", len(task.Services),
+	// )
+	// m.ops = append(m.ops, NewMockConsulOp("add", task.AllocID, task.Name))
+	return nil
+}
+
 func (m *MockConsulServiceClient) GetOps() []MockConsulOp {
 	m.mu.Lock()
 	defer m.mu.Unlock()

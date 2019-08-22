@@ -639,7 +639,7 @@ func (c *ServiceClient) RegisterAgent(role string, services []*structs.Service) 
 		ops.regServices = append(ops.regServices, serviceReg)
 
 		for _, check := range service.Checks {
-			checkID := makeCheckID(id, check)
+			checkID := MakeCheckID(id, check)
 			if check.Type == structs.ServiceCheckScript {
 				return fmt.Errorf("service %q contains invalid check: agent checks do not support scripts", service.Name)
 			}
@@ -772,7 +772,7 @@ func (c *ServiceClient) checkRegs(ops *operations, serviceID string, service *st
 
 	checkIDs := make([]string, 0, numChecks)
 	for _, check := range service.Checks {
-		checkID := makeCheckID(serviceID, check)
+		checkID := MakeCheckID(serviceID, check)
 		checkIDs = append(checkIDs, checkID)
 		if check.Type == structs.ServiceCheckScript {
 			if task.DriverExec == nil {
@@ -967,7 +967,7 @@ func (c *ServiceClient) RegisterTask(task *TaskServices) error {
 		serviceID := MakeTaskServiceID(task.AllocID, task.Name, service, task.Canary)
 		for _, check := range service.Checks {
 			if check.TriggersRestarts() {
-				checkID := makeCheckID(serviceID, check)
+				checkID := MakeCheckID(serviceID, check)
 				c.checkWatcher.Watch(task.AllocID, task.Name, checkID, check, task.Restarter)
 			}
 		}
@@ -1002,7 +1002,7 @@ func (c *ServiceClient) UpdateTask(old, newTask *TaskServices) error {
 			// Existing service entry removed
 			ops.deregServices = append(ops.deregServices, existingID)
 			for _, check := range existingSvc.Checks {
-				cid := makeCheckID(existingID, check)
+				cid := MakeCheckID(existingID, check)
 				ops.deregChecks = append(ops.deregChecks, cid)
 
 				// Unwatch watched checks
@@ -1030,12 +1030,12 @@ func (c *ServiceClient) UpdateTask(old, newTask *TaskServices) error {
 		// See if any checks were updated
 		existingChecks := make(map[string]*structs.ServiceCheck, len(existingSvc.Checks))
 		for _, check := range existingSvc.Checks {
-			existingChecks[makeCheckID(existingID, check)] = check
+			existingChecks[MakeCheckID(existingID, check)] = check
 		}
 
 		// Register new checks
 		for _, check := range newSvc.Checks {
-			checkID := makeCheckID(existingID, check)
+			checkID := MakeCheckID(existingID, check)
 			if _, exists := existingChecks[checkID]; exists {
 				// Check is still required. Remove it from the map so it doesn't get
 				// deleted later.
@@ -1091,7 +1091,7 @@ func (c *ServiceClient) UpdateTask(old, newTask *TaskServices) error {
 		serviceID := MakeTaskServiceID(newTask.AllocID, newTask.Name, service, newTask.Canary)
 		for _, check := range service.Checks {
 			if check.TriggersRestarts() {
-				checkID := makeCheckID(serviceID, check)
+				checkID := MakeCheckID(serviceID, check)
 				c.checkWatcher.Watch(newTask.AllocID, newTask.Name, checkID, check, newTask.Restarter)
 			}
 		}
@@ -1110,7 +1110,7 @@ func (c *ServiceClient) RemoveTask(task *TaskServices) {
 		ops.deregServices = append(ops.deregServices, id)
 
 		for _, check := range service.Checks {
-			cid := makeCheckID(id, check)
+			cid := MakeCheckID(id, check)
 			ops.deregChecks = append(ops.deregChecks, cid)
 
 			if check.TriggersRestarts() {
@@ -1165,6 +1165,11 @@ func (c *ServiceClient) AllocRegistrations(allocID string) (*AllocRegistration, 
 	}
 
 	return reg, nil
+}
+
+// TODO(tgross): make sure this is properly nil-checked, etc.
+func (c *ServiceClient) UpdateTTL(id, output, status string) error {
+	return c.client.UpdateTTL(id, output, status)
 }
 
 // Shutdown the Consul client. Update running task registrations and deregister
@@ -1275,10 +1280,10 @@ func MakeTaskServiceID(allocID, taskName string, service *structs.Service, canar
 	return fmt.Sprintf("%s%s-%s-%s-%s", nomadTaskPrefix, allocID, taskName, service.Name, service.PortLabel)
 }
 
-// makeCheckID creates a unique ID for a check.
+// MakeCheckID creates a unique ID for a check.
 //
 //  Example Check ID: _nomad-check-434ae42f9a57c5705344974ac38de2aee0ee089d
-func makeCheckID(serviceID string, check *structs.ServiceCheck) string {
+func MakeCheckID(serviceID string, check *structs.ServiceCheck) string {
 	return fmt.Sprintf("%s%s", nomadCheckPrefix, check.Hash(serviceID))
 }
 
